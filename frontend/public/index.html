@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Graph-RAG Chatbot</title>
+</head>
+
+<body>
+    <h1>Graph-RAG Chatbot</h1>
+    <textarea id="question" rows="4" cols="60" placeholder="Ask a question..."></textarea><br />
+    <button onclick="ask()">Send</button>
+    <h2>Answer:</h2>
+    <div id="answer" style="border:1px solid #ccc; padding:10px; width:60%; white-space: pre-wrap;"></div>
+
+    <script>
+        async function ask() {
+            const question = document.getElementById('question').value.trim();
+            if (!question) return;
+            try {
+                const resp = await fetch('http://localhost:8000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question })
+                });
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    document.getElementById('answer').innerText = 'Error: ' + (err.detail || resp.statusText);
+                    return;
+                }
+                const { answer } = await resp.json();
+                document.getElementById('answer').innerText = answer;
+            } catch (e) {
+                document.getElementById('answer').innerText = 'Network error: ' + e.message;
+            }
+        }
+    </script>
+</body>
+
+</html>
